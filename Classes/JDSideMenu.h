@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "JDSideMenuDelegate.h"
 
-@interface JDSideMenu : UIViewController
+@interface JDSideMenu : UIViewController <UIGestureRecognizerDelegate>
 
 @property (nonatomic, readonly) UIViewController *contentController;
 @property (nonatomic, readonly) UIViewController *menuController;

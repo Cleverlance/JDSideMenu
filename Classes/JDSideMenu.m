@@ -70,6 +70,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     
     // setup gesture recognizers
     self.panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panRecognized:)];
+    self.panRecognizer.delegate = self;
     [self.containerView addGestureRecognizer:self.panRecognizer];
 }
 
@@ -245,6 +246,12 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 {
     return !CGAffineTransformEqualToTransform(self.containerView.transform,
                                               CGAffineTransformIdentity);
+}
+
+#pragma mark - Gesture recognizer delegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
 }
 
 @end
