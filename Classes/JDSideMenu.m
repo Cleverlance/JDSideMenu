@@ -195,7 +195,12 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     [self addMenuControllerView];
     
     // disable user interactions when menu opened
-    self.contentController.view.userInteractionEnabled = NO;
+    if ([self.contentController isKindOfClass:[UINavigationController class]]) {
+        ((UINavigationController *)self.contentController).visibleViewController.view.userInteractionEnabled = NO;
+    }
+    else {
+        self.contentController.view.userInteractionEnabled = NO;
+    }
     
     // animate
     __weak typeof(self) blockSelf = self;
@@ -225,7 +230,12 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         [blockSelf.menuController.view removeFromSuperview];
         
         // enable user interaction in content view controller
-        self.contentController.view.userInteractionEnabled = YES;
+        if ([self.contentController isKindOfClass:[UINavigationController class]]) {
+            ((UINavigationController *)self.contentController).visibleViewController.view.userInteractionEnabled = YES;
+        }
+        else {
+            self.contentController.view.userInteractionEnabled = YES;
+        }
     }];
 }
 
