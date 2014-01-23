@@ -41,6 +41,7 @@
 		D27F254518305C6B00F04515 /* JDMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JDMenuViewController.m; sourceTree = "<group>"; };
 		D27F254918305E4000F04515 /* UIViewController+JDSideMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIViewController+JDSideMenu.h"; path = "Classes/UIViewController+JDSideMenu.h"; sourceTree = SOURCE_ROOT; };
 		D27F254A18305E4000F04515 /* UIViewController+JDSideMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+JDSideMenu.m"; path = "Classes/UIViewController+JDSideMenu.m"; sourceTree = SOURCE_ROOT; };
+		DCD8299718910DCD007225B7 /* JDSideMenuDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JDSideMenuDelegate.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +63,7 @@
 			children = (
 				D24FE85C18490CCA0008B05D /* JDSideMenu.h */,
 				D24FE85D18490CCA0008B05D /* JDSideMenu.m */,
+				DCD8299718910DCD007225B7 /* JDSideMenuDelegate.h */,
 				D24FE85E18490CCA0008B05D /* UIViewController+JDSideMenu.h */,
 				D24FE85F18490CCA0008B05D /* UIViewController+JDSideMenu.m */,
 			);

@@ -26,10 +26,38 @@
     UIViewController *navController = [[UINavigationController alloc] initWithRootViewController:contentController];
     JDSideMenu *sideMenu = [[JDSideMenu alloc] initWithContentController:navController
                                                           menuController:menuController];
+    sideMenu.shadowImage = [UIImage imageNamed:@"menu_shadow"];
     [sideMenu setBackgroundImage:[UIImage imageNamed:@"menuwallpaper"]];
+    sideMenu.delegate = self;
     self.window.rootViewController = sideMenu;
     
     return YES;
+}
+
+#pragma mark - Side menu delegate
+
+- (void)sideMenuWillAppear {
+    LOG_METHOD;
+}
+
+- (void)sideMenuDidAppear {
+    LOG_METHOD;
+}
+
+- (void)sideMenuWillDisappear {
+    LOG_METHOD;
+}
+
+- (void)sideMenuDidDisappear {
+    LOG_METHOD;
+}
+
+- (void)sideMenuWillChangeContent {
+    LOG_METHOD;
+}
+
+- (void)sideMenuDidChangeContent {
+    LOG_METHOD;
 }
 
 @end

@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "JDSideMenuDelegate.h"
 
-@interface JDAppDelegate : UIResponder <UIApplicationDelegate>
+@interface JDAppDelegate : UIResponder <UIApplicationDelegate, JDSideMenuDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 

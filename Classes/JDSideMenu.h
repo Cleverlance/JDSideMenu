@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "JDSideMenuDelegate.h"
 
 @interface JDSideMenu : UIViewController
 
@@ -14,8 +15,11 @@
 @property (nonatomic, readonly) UIViewController *menuController;
 
 @property (nonatomic, assign) CGFloat menuWidth;
-@property (nonatomic, assign) BOOL tapGestureEnabled;
 @property (nonatomic, assign) BOOL panGestureEnabled;
+
+@property (nonatomic, strong) UIImage *shadowImage;
+
+@property (nonatomic, weak) id<JDSideMenuDelegate> delegate;
 
 - (id)initWithContentController:(UIViewController*)contentController
                  menuController:(UIViewController*)menuController;
