@@ -12,6 +12,7 @@
 const CGFloat JDSideMenuMinimumRelativePanDistanceToOpen = 0.33;
 const CGFloat JDSideMenuDefaultMenuWidth = 260.0;
 const CGFloat JDSideMenuDefaultDamping = 0.5;
+const CGFloat JDSideMenuDefaulPanWidth = 8;
 
 // animation times
 const CGFloat JDSideMenuDefaultOpenAnimationTime = 1.2;
@@ -21,6 +22,8 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 @property (nonatomic, strong) UIImageView *backgroundView;
 @property (nonatomic, strong) UIView *containerView;
 @property (nonatomic, strong) UIPanGestureRecognizer *panRecognizer;
+@property (nonatomic, strong) UITapGestureRecognizer *tapRecognizer;
+@property (nonatomic, strong) UIView *panView;
 @end
 
 @implementation JDSideMenu
@@ -59,6 +62,13 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     self.contentController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:_containerView];
     
+    UIView *panView = [[UIView alloc] init];
+    panView.backgroundColor = [UIColor greenColor];
+    panView.alpha = 0.5;
+    panView.frame = CGRectMake(0, 0, JDSideMenuDefaulPanWidth, CGRectGetHeight(_containerView.bounds));
+    [_containerView addSubview:panView];
+    _panView = panView;
+    
     // add shadow to container view
     
     if (self.shadowImage) {
@@ -71,7 +81,9 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     // setup gesture recognizers
     self.panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panRecognized:)];
     self.panRecognizer.delegate = self;
-    [self.containerView addGestureRecognizer:self.panRecognizer];
+    [panView addGestureRecognizer:self.panRecognizer];
+    
+    self.tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapRecognized:)];
 }
 
 - (void)setBackgroundImage:(UIImage*)image;
@@ -119,6 +131,9 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         [blockSelf.containerView addSubview:self.contentController.view];
         [blockSelf.contentController didMoveToParentViewController:blockSelf];
         
+        // place pan view to the top of the content again
+        [blockSelf.containerView bringSubviewToFront:blockSelf.panView];
+        
         // remove old controller
         [previousController willMoveToParentViewController:nil];
         [previousController removeFromParentViewController];
@@ -138,17 +153,19 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 {
     if (!self.panGestureEnabled) return;
     
-    CGPoint translation = [recognizer translationInView:recognizer.view];
-    CGPoint velocity = [recognizer velocityInView:recognizer.view];
+    UIView *view = self.containerView;
+    
+    CGPoint translation = [recognizer translationInView:view];
+    CGPoint velocity = [recognizer velocityInView:view];
     
     switch (recognizer.state) {
         case UIGestureRecognizerStateBegan: {
             [self addMenuControllerView];
-            [recognizer setTranslation:CGPointMake(recognizer.view.frame.origin.x, 0) inView:recognizer.view];
+            [recognizer setTranslation:CGPointMake(view.frame.origin.x, 0) inView:view];
             break;
         }
         case UIGestureRecognizerStateChanged: {
-            [recognizer.view setTransform:CGAffineTransformMakeTranslation(MAX(0,translation.x), 0)];
+            [view setTransform:CGAffineTransformMakeTranslation(MAX(0,translation.x), 0)];
             break;
         }
         case UIGestureRecognizerStateEnded:
@@ -164,6 +181,10 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         default:
             break;
     }
+}
+
+- (void)tapRecognized:(UITapGestureRecognizer *)recognizer {
+    [self hideMenuAnimated:YES];
 }
 
 - (void)addMenuControllerView;
@@ -203,6 +224,12 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         self.contentController.view.userInteractionEnabled = NO;
     }
     
+    // resize pan view width to easily drag back the content
+    self.panView.frame = CGRectMake(0, 0, CGRectGetWidth(self.containerView.bounds) - self.menuWidth, CGRectGetHeight(self.panView.bounds));
+    
+    // allow tapping the visible part of content to hide the menu
+    [self.panView addGestureRecognizer:self.tapRecognizer];
+    
     // animate
     __weak typeof(self) blockSelf = self;
     [UIView animateWithDuration:animated ? duration : 0.0 delay:0
@@ -221,6 +248,8 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         [self.delegate sideMenuWillDisappear];
     }
     
+    [self.panView removeGestureRecognizer:self.tapRecognizer];
+    
     __weak typeof(self) blockSelf = self;
     [UIView animateWithDuration:JDSideMenuDefaultCloseAnimationTime animations:^{
         blockSelf.containerView.transform = CGAffineTransformIdentity;
@@ -237,6 +266,9 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         else {
             self.contentController.view.userInteractionEnabled = YES;
         }
+        
+        // restore size of pan view when content visible
+        self.panView.frame = CGRectMake(0, 0, JDSideMenuDefaulPanWidth, CGRectGetHeight(self.panView.bounds));
     }];
 }
 
@@ -246,12 +278,6 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 {
     return !CGAffineTransformEqualToTransform(self.containerView.transform,
                                               CGAffineTransformIdentity);
-}
-
-#pragma mark - Gesture recognizer delegate
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    return YES;
 }
 
 @end
