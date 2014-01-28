@@ -63,8 +63,6 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     [self.view addSubview:_containerView];
     
     UIView *panView = [[UIView alloc] init];
-    panView.backgroundColor = [UIColor greenColor];
-    panView.alpha = 0.5;
     panView.frame = CGRectMake(0, 0, JDSideMenuDefaulPanWidth, CGRectGetHeight(_containerView.bounds));
     [_containerView addSubview:panView];
     _panView = panView;
