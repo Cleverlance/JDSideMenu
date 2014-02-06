@@ -37,9 +37,15 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         _menuController = menuController;
         
         _menuWidth = JDSideMenuDefaultMenuWidth;
-        _panGestureEnabled = YES;
     }
     return self;
+}
+
+- (void)setMenuEnabled:(BOOL)menuEnabled {
+    _menuEnabled = menuEnabled;
+
+    self.panView.hidden = !menuEnabled;
+    self.panRecognizer.enabled = menuEnabled;
 }
 
 #pragma mark UIViewController
@@ -149,14 +155,6 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 
 - (void)panRecognized:(UIPanGestureRecognizer*)recognizer
 {
-    if (!self.panGestureEnabled) return;
-
-    // don't open menu when the content is submerged
-    if ([self.contentController isKindOfClass:[UINavigationController class]]) {
-        UINavigationController *navigationController = (UINavigationController *)self.contentController;
-        if (navigationController.viewControllers.firstObject != navigationController.visibleViewController) return;
-    }
-
     UIView *view = self.containerView;
     
     CGPoint translation = [recognizer translationInView:view];

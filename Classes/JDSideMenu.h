@@ -13,9 +13,10 @@
 
 @property (nonatomic, readonly) UIViewController *contentController;
 @property (nonatomic, readonly) UIViewController *menuController;
+@property (nonatomic, getter = isMenuEnabled) BOOL menuEnabled;
 
 @property (nonatomic, assign) CGFloat menuWidth;
-@property (nonatomic, assign) BOOL panGestureEnabled;
+
 
 @property (nonatomic, strong) UIImage *shadowImage;
 
