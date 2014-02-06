@@ -14,6 +14,7 @@
 @property (nonatomic, readonly) UIViewController *contentController;
 @property (nonatomic, readonly) UIViewController *menuController;
 @property (nonatomic, getter = isMenuEnabled) BOOL menuEnabled;
+@property (nonatomic) BOOL shouldBounce;
 
 @property (nonatomic, assign) CGFloat menuWidth;
 

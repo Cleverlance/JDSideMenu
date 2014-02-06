@@ -15,7 +15,7 @@ const CGFloat JDSideMenuDefaultDamping = 0.5;
 const CGFloat JDSideMenuDefaulPanWidth = 8;
 
 // animation times
-const CGFloat JDSideMenuDefaultOpenAnimationTime = 1.2;
+const CGFloat JDSideMenuDefaultOpenAnimationTime = 0.4;
 const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 
 @interface JDSideMenu ()
@@ -167,7 +167,11 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
             break;
         }
         case UIGestureRecognizerStateChanged: {
-            [view setTransform:CGAffineTransformMakeTranslation(MAX(0,translation.x), 0)];
+            CGFloat translationX = MAX(0,translation.x);
+            if (!self.shouldBounce) {
+                if (translationX > self.menuWidth) translationX = self.menuWidth;
+            }
+            [view setTransform:CGAffineTransformMakeTranslation(translationX, 0)];
             break;
         }
         case UIGestureRecognizerStateEnded:
@@ -234,14 +238,23 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     
     // animate
     __weak typeof(self) blockSelf = self;
-    [UIView animateWithDuration:animated ? duration : 0.0 delay:0
-         usingSpringWithDamping:JDSideMenuDefaultDamping initialSpringVelocity:velocity options:UIViewAnimationOptionAllowUserInteraction animations:^{
-             blockSelf.containerView.transform = CGAffineTransformMakeTranslation(self.menuWidth, 0);
-         } completion:^(BOOL finished) {
-             if ([self.delegate respondsToSelector:@selector(sideMenuDidAppear)]) {
-                 [self.delegate sideMenuDidAppear];
-             }
-         }];
+
+    void (^animationBlock)() = ^{
+        blockSelf.containerView.transform = CGAffineTransformMakeTranslation(self.menuWidth, 0);
+    };
+
+    void (^completionBlock)(BOOL) = ^(BOOL finished) {
+        if ([self.delegate respondsToSelector:@selector(sideMenuDidAppear)]) {
+            [self.delegate sideMenuDidAppear];
+        }
+    };
+
+    if (self.shouldBounce) {
+        [UIView animateWithDuration:animated ? (duration * 3) : 0.0 delay:0 usingSpringWithDamping:JDSideMenuDefaultDamping initialSpringVelocity:velocity options:UIViewAnimationOptionAllowUserInteraction animations:animationBlock completion:completionBlock];
+    }
+    else {
+        [UIView animateWithDuration:animated ? duration : 0.0 animations:animationBlock completion:completionBlock];
+    }
 }
 
 - (void)hideMenuAnimated:(BOOL)animated;
