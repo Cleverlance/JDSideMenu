@@ -127,7 +127,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     
     // animate in
     __weak typeof(self) blockSelf = self;
-    CGFloat offset = JDSideMenuDefaultMenuWidth + (self.view.frame.size.width-JDSideMenuDefaultMenuWidth)/2.0;
+    CGFloat offset = JDSideMenuDefaultMenuWidth;
     [UIView animateWithDuration:JDSideMenuDefaultCloseAnimationTime/2.0 animations:^{
         blockSelf.containerView.transform = CGAffineTransformMakeTranslation(offset, 0);
     } completion:^(BOOL finished) {
