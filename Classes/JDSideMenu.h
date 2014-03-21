@@ -9,6 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "JDSideMenuDelegate.h"
 
+UIKIT_EXTERN NSString * const JDSideMenuWillOpenNotification;
+UIKIT_EXTERN NSString * const JDSideMenuDidOpenNotification;
+UIKIT_EXTERN NSString * const JDSideMenuWillCloseNotification;
+UIKIT_EXTERN NSString * const JDSideMenuDidCloseNotification;
+
 @interface JDSideMenu : UIViewController <UIGestureRecognizerDelegate>
 
 @property (nonatomic, readonly) UIViewController *contentController;
