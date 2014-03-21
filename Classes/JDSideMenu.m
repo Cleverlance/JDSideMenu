@@ -8,6 +8,11 @@
 
 #import "JDSideMenu.h"
 
+NSString * const JDSideMenuWillOpenNotification = @"JDSideMenuWillOpenNotification";
+NSString * const JDSideMenuDidOpenNotification = @"JDSideMenuDidOpenNotification";
+NSString * const JDSideMenuWillCloseNotification = @"JDSideMenuWillCloseNotification";
+NSString * const JDSideMenuDidCloseNotification = @"JDSideMenuDidCloseNotification";
+
 // constants
 const CGFloat JDSideMenuMinimumRelativePanDistanceToOpen = 0.33;
 const CGFloat JDSideMenuDefaultMenuWidth = 260.0;
@@ -28,9 +33,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 
 @implementation JDSideMenu
 
-- (id)initWithContentController:(UIViewController*)contentController
-                 menuController:(UIViewController*)menuController;
-{
+- (id)initWithContentController:(UIViewController*)contentController menuController:(UIViewController*)menuController {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         _contentController = contentController;
@@ -50,8 +53,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 
 #pragma mark UIViewController
 
-- (void)viewDidLoad;
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     
     // add childcontroller
@@ -90,8 +92,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     self.tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapRecognized:)];
 }
 
-- (void)setBackgroundImage:(UIImage*)image;
-{
+- (void)setBackgroundImage:(UIImage*)image {
     if (!self.backgroundView && image) {
         self.backgroundView = [[UIImageView alloc] initWithImage:image];
         self.backgroundView.frame = self.view.bounds;
@@ -107,14 +108,14 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 
 #pragma mark controller replacement
 
-- (void)setContentController:(UIViewController*)contentController
-                    animated:(BOOL)animated;
-{
+- (void)setContentController:(UIViewController*)contentController animated:(BOOL)animated {
     if (contentController == nil) return;
     
     if ([self.delegate respondsToSelector:@selector(sideMenuDidChangeContent)]) {
         [self.delegate sideMenuWillChangeContent];
     }
+    [[NSNotificationCenter defaultCenter] postNotificationName:JDSideMenuWillCloseNotification object:self];
+
     UIViewController *previousController = self.contentController;
     _contentController = contentController;
     
@@ -146,6 +147,8 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         if ([self.delegate respondsToSelector:@selector(sideMenuDidChangeContent)]) {
             [self.delegate sideMenuDidChangeContent];
         }
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:JDSideMenuDidCloseNotification object:self];
         
         [blockSelf hideMenuAnimated:YES];
     }];
@@ -153,8 +156,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 
 #pragma mark Animation
 
-- (void)panRecognized:(UIPanGestureRecognizer*)recognizer
-{
+- (void)panRecognized:(UIPanGestureRecognizer*)recognizer {
     UIView *view = self.containerView;
     
     CGPoint translation = [recognizer translationInView:view];
@@ -193,8 +195,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     [self hideMenuAnimated:YES];
 }
 
-- (void)addMenuControllerView;
-{
+- (void)addMenuControllerView {
     if (self.menuController.view.superview == nil) {
         if ([self.delegate respondsToSelector:@selector(sideMenuWillAppear)]) {
             [self.delegate sideMenuWillAppear];
@@ -210,15 +211,13 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     }
 }
 
-- (void)showMenuAnimated:(BOOL)animated;
-{
-    [self showMenuAnimated:animated duration:JDSideMenuDefaultOpenAnimationTime
-           initialVelocity:1.0];
+- (void)showMenuAnimated:(BOOL)animated {
+    [self showMenuAnimated:animated duration:JDSideMenuDefaultOpenAnimationTime initialVelocity:1.0];
 }
 
-- (void)showMenuAnimated:(BOOL)animated duration:(CGFloat)duration
-         initialVelocity:(CGFloat)velocity;
-{
+- (void)showMenuAnimated:(BOOL)animated duration:(CGFloat)duration initialVelocity:(CGFloat)velocity {
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:JDSideMenuWillOpenNotification object:self];
     // add menu view
     [self addMenuControllerView];
     
@@ -247,6 +246,8 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         if ([self.delegate respondsToSelector:@selector(sideMenuDidAppear)]) {
             [self.delegate sideMenuDidAppear];
         }
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:JDSideMenuDidOpenNotification object:self];
     };
 
     if (self.shouldBounce) {
@@ -257,11 +258,12 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     }
 }
 
-- (void)hideMenuAnimated:(BOOL)animated;
-{
+- (void)hideMenuAnimated:(BOOL)animated {
     if ([self.delegate respondsToSelector:@selector(sideMenuWillDisappear)]) {
         [self.delegate sideMenuWillDisappear];
     }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:JDSideMenuWillCloseNotification object:self];
     
     [self.panView removeGestureRecognizer:self.tapRecognizer];
     
@@ -272,6 +274,9 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         if ([self.delegate respondsToSelector:@selector(sideMenuDidDisappear)]) {
             [self.delegate sideMenuDidDisappear];
         }
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:JDSideMenuDidCloseNotification object:self];
+
         [blockSelf.menuController.view removeFromSuperview];
         
         // enable user interaction in content view controller
@@ -289,8 +294,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 
 #pragma mark State
 
-- (BOOL)isMenuVisible;
-{
+- (BOOL)isMenuVisible {
     return !CGAffineTransformEqualToTransform(self.containerView.transform,
                                               CGAffineTransformIdentity);
 }
