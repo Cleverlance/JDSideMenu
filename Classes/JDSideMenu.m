@@ -147,8 +147,6 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         if ([self.delegate respondsToSelector:@selector(sideMenuDidChangeContent)]) {
             [self.delegate sideMenuDidChangeContent];
         }
-
-        [[NSNotificationCenter defaultCenter] postNotificationName:JDSideMenuDidCloseNotification object:self];
         
         [blockSelf hideMenuAnimated:YES];
     }];
