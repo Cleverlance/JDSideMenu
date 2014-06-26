@@ -33,6 +33,7 @@ UIKIT_EXTERN NSString * const JDSideMenuDidCloseNotification;
 
 - (void)setContentController:(UIViewController*)contentController
                     animated:(BOOL)animated;
+- (void)setContentControllerImmediately:(UIViewController *)contentController;
 
 // show / hide manually
 - (void)showMenuAnimated:(BOOL)animated;

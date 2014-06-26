@@ -152,6 +152,31 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     }];
 }
 
+- (void)setContentControllerImmediately:(UIViewController *)contentController {
+    if (contentController == nil) return;
+    
+    UIViewController *previousController = self.contentController;
+    _contentController = contentController;
+    
+    // add childcontroller
+    [self addChildViewController:self.contentController];
+    
+    self.contentController.view.frame = self.containerView.bounds;
+    self.contentController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    // move to container view
+    [self.containerView addSubview:self.contentController.view];
+    [self.contentController didMoveToParentViewController:self];
+    
+    // place pan view to the top of the content again
+    [self.containerView bringSubviewToFront:self.panView];
+    
+    // remove old controller
+    [previousController willMoveToParentViewController:nil];
+    [previousController removeFromParentViewController];
+    [previousController.view removeFromSuperview];
+}
+
 #pragma mark Animation
 
 - (void)panRecognized:(UIPanGestureRecognizer*)recognizer {
