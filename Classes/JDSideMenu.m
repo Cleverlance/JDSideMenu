@@ -40,6 +40,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         _menuController = menuController;
         
         _menuWidth = JDSideMenuDefaultMenuWidth;
+        _bounceOffset = 0.0;
     }
     return self;
 }
@@ -128,7 +129,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     
     // animate in
     __weak typeof(self) blockSelf = self;
-    CGFloat offset = JDSideMenuDefaultMenuWidth;
+    CGFloat offset = self.menuWidth + self.bounceOffset;
     [UIView animateWithDuration:JDSideMenuDefaultCloseAnimationTime/2.0 animations:^{
         blockSelf.containerView.transform = CGAffineTransformMakeTranslation(offset, 0);
     } completion:^(BOOL finished) {

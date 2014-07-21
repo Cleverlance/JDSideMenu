@@ -22,6 +22,7 @@ UIKIT_EXTERN NSString * const JDSideMenuDidCloseNotification;
 @property (nonatomic) BOOL shouldBounce;
 
 @property (nonatomic, assign) CGFloat menuWidth;
+@property (nonatomic, assign) CGFloat bounceOffset;
 
 
 @property (nonatomic, strong) UIImage *shadowImage;
