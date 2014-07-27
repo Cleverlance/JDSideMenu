@@ -10,6 +10,7 @@
 
 @protocol JDSideMenuDelegate <NSObject>
 
+@optional
 - (void)sideMenuWillAppear;
 - (void)sideMenuDidAppear;
 - (void)sideMenuWillDisappear;
