@@ -15,7 +15,7 @@ NSString * const JDSideMenuDidCloseNotification = @"JDSideMenuDidCloseNotificati
 
 // constants
 const CGFloat JDSideMenuMinimumRelativePanDistanceToOpen = 0.33;
-const CGFloat JDSideMenuDefaultMenuWidth = 260.0;
+const CGFloat JDSideMenuRatio = 0.8125;
 const CGFloat JDSideMenuDefaultDamping = 0.5;
 const CGFloat JDSideMenuDefaulPanWidth = 8;
 
@@ -39,7 +39,7 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
         _contentController = contentController;
         _menuController = menuController;
         
-        _menuWidth = JDSideMenuDefaultMenuWidth;
+        _menuWidth = CGRectGetWidth([[UIScreen mainScreen] bounds]) * JDSideMenuRatio;
         _bounceOffset = 0.0;
     }
     return self;
