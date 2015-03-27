@@ -108,7 +108,6 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 }
 
 #pragma mark controller replacement
-
 - (void)setContentController:(UIViewController*)contentController animated:(BOOL)animated {
     if (contentController == nil) return;
     
@@ -130,27 +129,56 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     // animate in
     __weak typeof(self) blockSelf = self;
     CGFloat offset = self.menuWidth + self.bounceOffset;
-    [UIView animateWithDuration:JDSideMenuDefaultCloseAnimationTime/2.0 animations:^{
-        blockSelf.containerView.transform = CGAffineTransformMakeTranslation(offset, 0);
-    } completion:^(BOOL finished) {
-        // move to container view
-        [blockSelf.containerView addSubview:self.contentController.view];
-        [blockSelf.contentController didMoveToParentViewController:blockSelf];
-        
-        // place pan view to the top of the content again
-        [blockSelf.containerView bringSubviewToFront:blockSelf.panView];
-        
-        // remove old controller
-        [previousController willMoveToParentViewController:nil];
-        [previousController removeFromParentViewController];
-        [previousController.view removeFromSuperview];
-        
-        if ([self.delegate respondsToSelector:@selector(sideMenuDidChangeContent)]) {
-            [self.delegate sideMenuDidChangeContent];
-        }
-        
-        [blockSelf hideMenuAnimated:YES];
-    }];
+    if (animated) {
+        [UIView animateWithDuration:JDSideMenuDefaultCloseAnimationTime/2.0 animations:^{
+            blockSelf.containerView.transform = CGAffineTransformMakeTranslation(offset, 0);
+        } completion:^(BOOL finished) {
+            [self replaceControllersInBlockSelf:blockSelf previousController:previousController animated:YES];
+        }];
+    } else {
+        [self replaceControllersInBlockSelf:blockSelf previousController:previousController animated:NO];
+    }
+}
+
+- (void)replaceControllersInBlockSelf:(__weak JDSideMenu *)blockSelf previousController:(UIViewController *)previousController animated:(BOOL)animated {
+    // move to container view
+    [blockSelf.containerView addSubview:self.contentController.view];
+    [blockSelf.contentController didMoveToParentViewController:blockSelf];
+    
+    // place pan view to the top of the content again
+    [blockSelf.containerView bringSubviewToFront:blockSelf.panView];
+    
+    // remove old controller
+    [previousController willMoveToParentViewController:nil];
+    [previousController removeFromParentViewController];
+    [previousController.view removeFromSuperview];
+    
+    if ([self.delegate respondsToSelector:@selector(sideMenuDidChangeContent)]) {
+        [self.delegate sideMenuDidChangeContent];
+    }
+    
+    [blockSelf hideMenuAnimated:animated];
+}
+
+- (void)hideMenuCopletionInBlockSelf:(__weak JDSideMenu *)blockSelf {
+    if ([self.delegate respondsToSelector:@selector(sideMenuDidDisappear)]) {
+        [self.delegate sideMenuDidDisappear];
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:JDSideMenuDidCloseNotification object:self];
+    
+    [blockSelf.menuController.view removeFromSuperview];
+    
+    // enable user interaction in content view controller
+    if ([self.contentController isKindOfClass:[UINavigationController class]]) {
+        ((UINavigationController *)self.contentController).visibleViewController.view.userInteractionEnabled = YES;
+    }
+    else {
+        self.contentController.view.userInteractionEnabled = YES;
+    }
+    
+    // restore size of pan view when content visible
+    self.panView.frame = CGRectMake(0, 0, JDSideMenuDefaulPanWidth, CGRectGetHeight(self.panView.bounds));
 }
 
 - (void)setContentControllerImmediately:(UIViewController *)contentController {
@@ -179,7 +207,6 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
 }
 
 #pragma mark Animation
-
 - (void)panRecognized:(UIPanGestureRecognizer*)recognizer {
     UIView *view = self.containerView;
     
@@ -292,32 +319,18 @@ const CGFloat JDSideMenuDefaultCloseAnimationTime = 0.4;
     [self.panView removeGestureRecognizer:self.tapRecognizer];
     
     __weak typeof(self) blockSelf = self;
-    [UIView animateWithDuration:JDSideMenuDefaultCloseAnimationTime animations:^{
-        blockSelf.containerView.transform = CGAffineTransformIdentity;
-    } completion:^(BOOL finished) {
-        if ([self.delegate respondsToSelector:@selector(sideMenuDidDisappear)]) {
-            [self.delegate sideMenuDidDisappear];
-        }
-
-        [[NSNotificationCenter defaultCenter] postNotificationName:JDSideMenuDidCloseNotification object:self];
-
-        [blockSelf.menuController.view removeFromSuperview];
-        
-        // enable user interaction in content view controller
-        if ([self.contentController isKindOfClass:[UINavigationController class]]) {
-            ((UINavigationController *)self.contentController).visibleViewController.view.userInteractionEnabled = YES;
-        }
-        else {
-            self.contentController.view.userInteractionEnabled = YES;
-        }
-        
-        // restore size of pan view when content visible
-        self.panView.frame = CGRectMake(0, 0, JDSideMenuDefaulPanWidth, CGRectGetHeight(self.panView.bounds));
-    }];
+    if ( animated ) {
+        [UIView animateWithDuration:JDSideMenuDefaultCloseAnimationTime animations:^{
+            blockSelf.containerView.transform = CGAffineTransformIdentity;
+        } completion:^(BOOL finished) {
+            [self hideMenuCopletionInBlockSelf:blockSelf];
+        }];
+    } else {
+        [self hideMenuCopletionInBlockSelf:blockSelf];
+    }
 }
 
 #pragma mark State
-
 - (BOOL)isMenuVisible {
     return !CGAffineTransformEqualToTransform(self.containerView.transform,
                                               CGAffineTransformIdentity);
